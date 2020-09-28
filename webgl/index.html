@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello</title>
+    <!-- <script type="text/javascript" src="webgl-utils.js"></script> -->
+    <script id="vertex-shader" type="shader">
+        //顶点着色器
+        attribute vec4 a_position;
+
+        void main() {
+            gl_Position = a_position;
+        }
+    </script>
+
+    <script id="fragment-shader" type="shader">
+        //片段着色器
+        precision mediump float;
+
+        void main() {
+            gl_FragColor = vec4(1, 0, 0.5, 1);
+        }
+    </script>
+</head>
+<body>
+    <!-- 添加canvas标签，并加上红色边框以便于在页面上查看 -->
+    <canvas id="mainCanvas" width="600px" height="600px" style="border: 1px solid red;">
+        您的浏览器不支持canvas标签。
+    </canvas>
+
+    <script type="text/javascript">
+        /**
+         * 创建着色器
+         * type 着色器类型，gl.VERTEX_SHADER、gl.FRAGMENT_SHADER
+         */
+        function createShader(gl, type, source) {
+            var shader = gl.createShader(type);
+            gl.shaderSource(shader, source);//提供数据源
+            gl.compileShader(shader);//编译shader，生成着色器
+            var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+            if (success) {
+                return shader;
+            }
+            //创建失败，打印
+            console.log(gl.getShaderInfoLog(shader));
+            gl.deleteShader(shader);
+        }
+
+        /**
+         * 创建着色程序
+         */
+        function createProgram(gl, vertexShader, fragmentShader) {
+            var program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            var success = gl.getProgramParameter(program, gl.LINK_STATUS);
+            if (success) {
+                return program;
+            }
+            console.log(gl.getProgramInfoLog(program));
+            gl.deleteProgram(program);
+        }
+
+        function main() {
+            var canvas = document.getElementById("mainCanvas");
+            var gl = canvas.getContext("webgl");
+            if (!gl) {
+                alert("不支持webgl");
+            }
+            console.log(gl)
+            //创建shader程序
+            var vertexShaderSource = document.getElementById("vertex-shader").text;
+            var fragmentShaderSource = document.getElementById("fragment-shader").text;
+            var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+            var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+            var program = createProgram(gl, vertexShader, fragmentShader);
+            //设置数据
+            var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+            var positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            var positions = [
+                -1, 0,//左下角点
+                0, 0.5,//中间点
+                1, 0//右边点
+            ];
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+            // webglUtils.resizeCanvasToDisplaySize(gl.canvas);
+            // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+            gl.clearColor(0, 0, 0, 0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            gl.useProgram(program);
+            gl.enableVertexAttribArray(positionAttributeLocation);
+
+            var size = 2;
+            var type = gl.FLOAT;
+            var normalize = false;
+            var stride = 0;
+            var offset = 0;
+            gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);//属性绑定到当前的buffer
+
+            //开始画
+            var primiriveType = gl.TRIANGLES;
+            var offset = 0;
+            var count = 3;
+            gl.drawArrays(primiriveType, offset, count);
+        }
+
+        main();
+
+    </script>
+
+</body>
+</html>
