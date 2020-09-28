@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hello</title>
-    <!-- <script type="text/javascript" src="webgl-utils.js"></script> -->
+    <title>Hello World</title>
     <script id="vertex-shader" type="shader">
         //顶点着色器
         attribute vec4 a_position;
@@ -84,9 +83,6 @@
                 1, 0//右边点
             ];
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-            // webglUtils.resizeCanvasToDisplaySize(gl.canvas);
-            // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
             gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT);
